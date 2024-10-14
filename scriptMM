@@ -1,0 +1,170 @@
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+
+PS C:\Users\mpm15> ssh mpm153@pegasus.ccs.miami.edu
+mpm153@pegasus.ccs.miami.edu's password:
+Last login: Mon Oct 14 17:59:57 2024 from 10.15.140.53
+------------------------------------------------------------------------------
+                     Welcome to the Pegasus Supercomputer
+           Center for Computational Science, University of Miami
+------------------------------------------------------------------------------
+
+              ** Unauthorized use/access is prohibited. **
+
+If you log on to this computer system, you acknowledge your awareness
+of and concurrence with the University Use Policy. The University will prosecute
+violators to the full extent of the law.
+
+ACS Usage Policies: https://acs-docs.readthedocs.io/policies
+______________________________________________________________________________
+
+Questions and Problem Reports:
+
+-->  hpc@ccs.miami.edu
+
+If you are new to Pegasus and high-performance compute clusters,
+start with our documentation and user guides.
+
+Documentation  :  https://acs-docs.readthedocs.io/
+Pegasus Cluster:  https://acs-docs.readthedocs.io/pegasus
+______________________________________________________________________________
+
+Welcome to Pegasus.  Before use, please read these important system notes:
+
+--> Pegasus is currently running the LSF resource manager to
+    schedule all compute resources.
+
+    See "man bsub", our online resources, and the LSF 9.1.1 user guide
+    for more detailed information.
+
+    https://acs-docs.readthedocs.io/pegasus/jobs
+
+
+--> You may compile software and test commands on login nodes.
+    However, any jobs exceeding 30 minutes of run time or using
+    excessive resources on login nodes will be terminated and
+    the user's account may be suspended.
+
+--> To see which software packages are available, issue command:
+         module avail
+
+    To load a module, issue command:
+         module load <module name>
+
+    See "module help" or consult ACS Documentation & User Guides:
+         https://acs-docs.readthedocs.io/pegasus/soft
+
+--> Pegasus has two parallel file systems available to users:
+         /nethome (permanent, quota'd, not backed-up)
+         /scratch (high-speed *purged* storage)
+
+    IMPORTANT:  *NO* backups are performed on Pegasus file systems
+
+    Files on /scratch are subject to purging after 21 days. No critical data should be kept on /scratch
+
+    See ACS Policies for more information
+         https://acs-docs.readthedocs.io/policies
+
+
+If you have any questions or concerns, please do not hesitate to reach out to us at hpc@ccs.miami.edu
+
+
+[mpm153@login4 ~]$  bsub -Is -q gpu_sccc -P sccc_hpc -m n522 bash
+Job is submitted to <sccc_hpc> project.
+Job <28994702> is submitted to queue <gpu_sccc>.
+<<Waiting for dispatch ...>>
+<<Starting on n522>>
+[mpm153@n522 ~]$ module load nextflow
+--------------------------------------------------------------------------------
+This Conda env provides Nextflow 24.04.4, nc-core/tools 2.14.1, Java 17.0.11,
+Python 3.12, and all their dependencies.
+--------------------------------------------------------------------------------
+(nextflow) [mpm153@n522 ~]$ params {
+fig_profile_descbash: params: command not found...
+ription   = 'UM SCCC pegasus HPC profile.'
+    config_profile_contact       = 'mpm153@miami.edu'  // Updated email
+
+    max_memory                   = 384.GB
+    max_cpus                     = 64
+    max_time                     = 30.m
+
+    lsf_queue_size               = 256
+    schema_ignore_params         = 'genomes,lsf_opts,lsf_queue_size'
+    validationSchemaIgnoreParams = "genomes,lsf_opts,lsf_queue_size,schema_ignore_params"
+}
+
+singularity.enabled = true
+
+aws {
+    client {
+        anonymous = true
+    }
+}
+
+process {
+    clusterOptions = '-P sccc_ceccarelli'
+    scratch = '/scratch/projects/sccc_ceccarelli/mpm153'  // Updated scratch directory
+    resourceLimits = [
+        memory: 6.GB,
+        cpus: 1,
+        time: 30.m
+    ]
+    queue          = 'sccc2'
+    executor       = 'lsf'
+    maxRetries     = 3
+    errorStrategy  = { task.attempt <= 3 ? 'retry' : 'finish' }
+    cache          = 'lenient'
+}
+
+executor {
+    perTaskReserve = true
+    perJobMemLimit = false
+    queueSize      = params.lsf_queue_size
+}
+(nextflow) [mpm153@n522 ~]$     config_profile_description   = 'UM SCCC pegasus HPC profile.'
+bash: config_profile_description: command not found...
+(nextflow) [mpm153@n522 ~]$     config_profile_contact       = 'mpm153@miami.edu'  // Updated email
+bash: config_profile_contact: command not found...
+(nextflow) [mpm153@n522 ~]$
+(nextflow) [mpm153@n522 ~]$     max_memory                   = 384.GB
+bash: max_memory: command not found...
+(nextflow) [mpm153@n522 ~]$     max_cpus                     = 64
+bash: max_cpus: command not found...
+(nextflow) [mpm153@n522 ~]$     max_time                     = 30.m
+bash: max_time: command not found...
+(nextflow) [mpm153@n522 ~]$
+(nextflow) [mpm153@n522 ~]$     lsf_queue_size               = 256
+bash: lsf_queue_size: command not found...
+(nextflow) [mpm153@n522 ~]$     schema_ignore_params         = 'genomes,lsf_opts,lsf_queue_size'
+bash: schema_ignore_params: command not found...
+(nextflow) [mpm153@n522 ~]$     validationSchemaIgnoreParams = "genomes,lsf_opts,lsf_queue_size,schema_ignore_params"
+bash: validationSchemaIgnoreParams: command not found...
+(nextflow) [mpm153@n522 ~]$ }
+bash: syntax error near unexpected token `}'
+(nextflow) [mpm153@n522 ~]$
+(nextflow) [mpm153@n522 ~]$ singularity.enabled = true
+bash: singularity.enabled: command not found...
+(nextflow) [mpm153@n522 ~]$
+(nextflow) [mpm153@n522 ~]$ aws {
+bash: aws: command not found...
+Install package 'awscli' to provide command 'aws'? [N/y] Y
+
+
+ * Waiting in queue...
+The following packages have to be installed:
+ awscli-1.18.156-4.el8.noarch   Universal Command Line Environment for AWS
+ groff-1.22.3-18.el8.x86_64     A document formatting system
+ python3-botocore-1.18.15-1.el8.noarch  Low-level, data-driven core of boto 3
+ python3-colorama-0.4.3-1.el8.noarch    Cross-platform colored terminal text
+ python3-docutils-0.14-12.module+el8.4.0+597+ddf0ddea.noarch    System for processing plaintext documentation for python3
+ python3-jmespath-0.9.0-11.el8.noarch   JSON Matching Expressions
+ python3-pyasn1-0.3.7-6.el8.noarch      ASN.1 tools for Python 3
+ python3-rsa-4.9-2.el8.noarch   Pure-Python RSA implementation
+ python3-s3transfer-0.3.4-1.el8.noarch  Amazon S3 Transfer Manager
+Proceed with changes? [N/y] Y
+
+
+ * Waiting in queue...
+ * Waiting for authentication... Failed to install packages: Failed to obtain authentication.
